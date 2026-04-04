@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f4f7f6; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding-top: 50px; }
+    .card { border: none; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    .btn-confirm { background-color: #28a745; color: white; padding: 12px 40px; font-size: 1.2rem; border-radius: 30px; }
+    .salary-total { font-size: 2.2rem; color: #007bff; font-weight: bold; }
+    .table-container { max-height: 400px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+<div id="loginPage" class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card p-4">
+        <h3 class="text-center mb-4">Sherry Aerial 薪資查詢</h3>
+        <input type="text" id="username" class="form-control mb-3" placeholder="您的姓名">
+        <input type="password" id="password" class="form-control mb-3" placeholder="密碼">
+        <button onclick="handleLogin()" id="loginBtn" class="btn btn-primary w-100">登入系統</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="mainPage" class="container d-none">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card p-4">
+        <div class="d-flex justify-content-between">
+          <h4>老師您好, <span id="displayName"></span></h4>
+          <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">登出</button>
+        </div>
+        <hr>
+        
+        <h5>本月課程明細</h5>
+        <div class="table-container mb-4">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr><th>日期</th><th>課程名稱</th><th>狀態</th><th>鐘點費</th></tr>
+            </thead>
+            <tbody id="classBody"></tbody>
+          </table>
+        </div>
+
+        <div class="bg-light p-4 rounded text-end">
+          <p class="mb-1">初始鐘點費：$<span id="baseVal"></span></p>
+          <p class="mb-1">績效獎金：$<span id="bonusVal"></span></p>
+          <p id="extraRow" class="mb-1 d-none">固定加給：$<span id="extraVal"></span></p>
+          <p id="insRow" class="mb-1 text-danger d-none">勞健保扣除：-$<span id="insVal"></span></p>
+          <hr>
+          <p class="mb-0">本月實領薪資</p>
+          <div class="salary-total">$<span id="totalVal"></span></div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button id="confBtn" onclick="handleConfirm()" class="btn btn-confirm">核對無誤，點擊確認</button>
+          <div id="confMsg" class="d-none text-success h5">✓ 您已於試算表完成確認</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let loggedUser = "";
+
+  function handleLogin() {
+    const n = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    if(!n || !p) return alert("請輸入姓名與密碼");
+    
+    document.getElementById('loginBtn').disabled = true;
+    document.getElementById('loginBtn').innerText = "讀取中...";
+
+    google.script.run
+      .withSuccessHandler(data => {
+        loggedUser = data.name;
+        renderData(data);
+      })
+      .withFailureHandler(err => {
+        alert(err.message);
+        document.getElementById('loginBtn').disabled = false;
+        document.getElementById('loginBtn').innerText = "登入系統";
+      })
+      .loginAndFetch(n, p);
+  }
+
+  function renderData(data) {
+    document.getElementById('loginPage').classList.add('d-none');
+    document.getElementById('mainPage').classList.remove('d-none');
+    document.getElementById('displayName').innerText = data.name;
+
+    // 明細
+    let html = "";
+    data.classes.forEach(c => {
+      html += `<tr><td>${new Date(c.date).toLocaleDateString()}</td><td>${c.title}</td><td>${c.status}</td><td>${c.fee}</td></tr>`;
+    });
+    document.getElementById('classBody').innerHTML = html;
+
+    // 金額
+    document.getElementById('baseVal').innerText = data.base;
+    document.getElementById('bonusVal').innerText = data.bonus;
+    
+    let total = data.base + data.bonus + data.extra - data.insurance;
+    
+    if(data.extra > 0) {
+      document.getElementById('extraRow').classList.remove('d-none');
+      document.getElementById('extraVal').innerText = data.extra;
+    }
+    if(data.insurance > 0) {
+      document.getElementById('insRow').classList.remove('d-none');
+      document.getElementById('insVal').innerText = data.insurance;
+    }
+    document.getElementById('totalVal').innerText = total.toLocaleString();
+
+    // 狀態
+    if(data.isConfirmed) {
+      document.getElementById('confBtn').classList.add('d-none');
+      document.getElementById('confMsg').classList.remove('d-none');
+    }
+  }
+
+  function handleConfirm() {
+    if(!confirm("確認薪資明細正確嗎？")) return;
+    google.script.run.withSuccessHandler(success => {
+      if(success) {
+        document.getElementById('confBtn').classList.add('d-none');
+        document.getElementById('confMsg').classList.remove('d-none');
+        alert("確認成功！");
+      }
+    }).submitConfirmation(loggedUser);
+  }
+</script>
+</body>
+</html>
