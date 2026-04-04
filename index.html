@@ -1,30 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sherry Aerial 薪資查詢系統</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root { --main-purple: #6a1b9a; --light-purple: #f3e5f5; --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body { background: var(--bg-gradient); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 0; }
+        .container { max-width: 500px; width: 100%; background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
+        .header-logo { text-align: center; margin-bottom: 25px; }
+        .header-logo h2 { color: var(--main-purple); font-weight: 800; margin-bottom: 5px; }
+        
+        .form-label { font-weight: 600; color: #444; }
+        .form-control, .form-select { border-radius: 12px; padding: 12px; border: 1px solid #ddd; margin-bottom: 15px; background-color: #fff !important; }
+        .btn-primary { background: var(--main-purple); border: none; border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; }
+
+        .salary-card { background: var(--light-purple); border-radius: 18px; padding: 20px; margin-bottom: 25px; border: 1px solid #e1bee7; }
+        .salary-item { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .total-row { border-top: 2px solid #d1c4e9; padding-top: 10px; margin-top: 10px; color: #d32f2f; font-weight: bold; font-size: 1.4rem; }
+        
+        .table-responsive { border-radius: 12px; border: 1px solid #eee; }
+        .table thead { background: var(--main-purple); color: white; }
+        .hidden { display: none !important; }
+        .loading-overlay { text-align: center; padding: 40px 0; }
+        
+        /* 手機版表格文字縮小 */
+        @media (max-width: 576px) { .table { font-size: 0.85rem; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-logo">
+        <h2>Sherry Aerial</h2>
+        <p class="text-muted">老師薪資核對系統</p>
+    </div>
+
+    <div id="init-loader" class="loading-overlay">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3">正在連線至雲端系統...</p>
+    </div>
+
+    <div id="login-section" class="hidden">
+        <div class="mb-3">
+            <label class="form-label">選擇老師姓名</label>
+            <select id="teacherName" class="form-select">
+                <option value="">載入名單中...</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="form-label">查詢密碼</label>
+            <input type="password" id="password" class="form-control" placeholder="請輸入密碼">
+        </div>
+        <button class="btn btn-primary" onclick="login()">登入查詢</button>
+    </div>
+
+    <div id="action-loader" class="loading-overlay hidden">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3" id="loader-text">讀取明細中...</p>
+    </div>
+
+    <div id="result-section" class="hidden">
+        <div class="salary-card">
+            <h5 class="mb-3" id="display-name" style="color: #6a1b9a; font-weight: bold;"></h5>
+            <div class="salary-item"><span>基礎鐘點費</span><span id="base-fee"></span></div>
+            <div class="salary-item"><span>獎金總額</span><span id="bonus-fee"></span></div>
+            <div class="salary-item total-row"><span>本月實領總額</span><span id="total-fee"></span></div>
+        </div>
+
+        <h6 class="mb-3 fw-bold">📅 本月課程明細：</h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead><tr><th>日期</th><th>課程</th><th>狀態</th><th>鐘點</th></tr></thead>
+                <tbody id="class-detail"></tbody>
+            </table>
+        </div>
+
+        <div id="confirm-box" class="mt-4">
+            <button id="confirm-btn" class="btn btn-success w-100 py-3 fw-bold" onclick="confirmSalary()">✅ 內容正確無誤</button>
+            <div id="confirmed-msg" class="text-center text-success fw-bold p-3 hidden" style="background: #e8f5e9; border-radius: 12px;">
+                🎉 您已完成本月確認
+            </div>
+        </div>
+        
+        <button class="btn btn-link w-100 mt-4 text-muted text-decoration-none" onclick="location.reload()">登出並返回</button>
+    </div>
+</div>
+
 <script>
+    // ⚠️ 這是你的 API 網址，請確認「管理部署」中是否與此一致
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyMMrzKOIhEOeDpHP74910qzfd-HAPnUgq0FTAImHUHCODT2DcnGZmyypS4fdOx9pYAaA/exec";
     let currentTeacher = "";
 
-    // 網頁一載入，自動抓取名單
-    window.onload = async function() {
+    // 頁面開啟時自動執行
+    document.addEventListener('DOMContentLoaded', fetchTeacherList);
+
+    async function fetchTeacherList() {
         try {
             const response = await fetch(`${GAS_URL}?action=getTeachers`);
             const result = await response.json();
             if (result.success) {
                 const select = document.getElementById('teacherName');
-                select.innerHTML = '<option value="">請選擇您的名字...</option>'; // 清空
+                select.innerHTML = '<option value="">請選擇您的名字...</option>';
                 result.data.forEach(name => {
                     const opt = document.createElement('option');
                     opt.value = name;
                     opt.innerText = name;
                     select.appendChild(opt);
                 });
+                toggleUI('login');
+            } else {
+                alert("抓取名單失敗：" + result.message);
             }
-        } catch (e) { console.error("無法取得名單"); }
-    };
+        } catch (e) {
+            console.error(e);
+            alert("系統連線逾時，請檢查 Google 腳本部署設定是否為『任何人』。");
+        }
+    }
 
     async function login() {
         const name = document.getElementById('teacherName').value;
         const pwd = document.getElementById('password').value;
         if (!name || !pwd) { alert("請選擇姓名並輸入密碼"); return; }
-        toggleUI('loading');
+
+        document.getElementById('loader-text').innerText = "驗證身分中...";
+        toggleUI('action');
+        
         try {
             const response = await fetch(`${GAS_URL}?action=login&name=${encodeURIComponent(name)}&password=${encodeURIComponent(pwd)}`);
             const result = await response.json();
@@ -33,10 +135,13 @@
                 currentTeacher = name;
                 toggleUI('result');
             } else {
-                alert("錯誤：" + result.message);
+                alert(result.message);
                 toggleUI('login');
             }
-        } catch (e) { alert("伺服器連線失敗"); toggleUI('login'); }
+        } catch (e) {
+            alert("登入連線失敗");
+            toggleUI('login');
+        }
     }
 
     function renderData(data) {
@@ -44,19 +149,53 @@
         document.getElementById('base-fee').innerText = `$${data.base.toLocaleString()}`;
         document.getElementById('bonus-fee').innerText = `$${data.bonus.toLocaleString()}`;
         document.getElementById('total-fee').innerText = `$${data.total.toLocaleString()}`;
+
         let html = "";
         data.classes.forEach(c => {
-            // 確認連動：顯示日期、課程、狀態、鐘點
+            const statusClass = c.status.includes('出席') ? 'bg-success' : 'bg-secondary';
             html += `<tr>
                 <td>${c.date}</td>
                 <td>${c.title}</td>
-                <td><span class="badge ${c.status.includes('出席') ? 'bg-success' : 'bg-secondary'}">${c.status}</span></td>
-                <td>$${c.fee}</td>
+                <td><span class="badge ${statusClass}">${c.status}</span></td>
+                <td>$${c.fee.toLocaleString()}</td>
             </tr>`;
         });
         document.getElementById('class-detail').innerHTML = html;
+
         if (data.isConfirmed) showConfirmedStatus();
     }
 
-    // ... (其餘 confirmSalary, toggleUI 等函數保持不變) ...
+    async function confirmSalary() {
+        if (!confirm("確定薪資明細與金額無誤嗎？")) return;
+        document.getElementById('loader-text').innerText = "正在儲存確認結果...";
+        toggleUI('action');
+        try {
+            const response = await fetch(`${GAS_URL}?action=confirm&name=${encodeURIComponent(currentTeacher)}`);
+            const result = await response.json();
+            if (result.success) {
+                showConfirmedStatus();
+                alert("確認成功，辛苦了！");
+                toggleUI('result');
+            }
+        } catch (e) { alert("確認失敗"); toggleUI('result'); }
+    }
+
+    function showConfirmedStatus() {
+        document.getElementById('confirm-btn').classList.add('hidden');
+        document.getElementById('confirmed-msg').classList.remove('hidden');
+    }
+
+    function toggleUI(state) {
+        document.getElementById('init-loader').classList.add('hidden');
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('action-loader').classList.add('hidden');
+        document.getElementById('result-section').classList.add('hidden');
+        
+        if(state === 'login') document.getElementById('login-section').classList.remove('hidden');
+        if(state === 'action') document.getElementById('action-loader').classList.remove('hidden');
+        if(state === 'result') document.getElementById('result-section').classList.remove('hidden');
+    }
 </script>
+
+</body>
+</html>
