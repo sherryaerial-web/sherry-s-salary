@@ -7,167 +7,87 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --soft-gold: #D4AF37;       /* 質感香檳金 */
-            --deep-gold: #B8860B;       /* 深金色文字 */
-            --light-gold: #FDF5E6;      /* 淺底金 */
-            --text-gray: #444444;       /* 主文字深灰 */
-            --hint-gray: #8E8E8E;       /* 提示文字 */
-            --marble-white: #FFFFFF;    /* 珍珠白 */
-            --bg-gradient: linear-gradient(135deg, #F8F9FA 0%, #ECECEC 100%);
+            --gold-primary: #C5A059;
+            --gold-dark: #8E7341;
+            --white: #FFFFFF;
+            --bg-light: #FBFBFB;
+            --text-dark: #333333;
+            --text-light: #999999;
+            --border-color: #F0F0F0;
         }
 
         * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: var(--bg-gradient);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-gray);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            background-color: var(--bg-light);
+            background-image: radial-gradient(circle at 50% 0%, #FFFFFF 0%, #F2F0ED 100%);
+            margin: 0; padding: 20px; color: var(--text-dark);
+            display: flex; justify-content: center; min-height: 100vh;
         }
 
         .container {
-            width: 100%;
-            max-width: 480px;
-            background: var(--marble-white);
-            padding: 40px 25px;
-            border-radius: 24px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.06);
-            border: 1px solid rgba(212, 175, 55, 0.15);
+            width: 100%; max-width: 460px; background: var(--white);
+            padding: 40px 25px; border-radius: 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+            border: 1px solid rgba(197, 160, 89, 0.1);
             text-align: center;
-            animation: fadeIn 0.8s ease-out;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { 
-            font-family: 'Playfair Display', serif;
-            font-size: 24px;
-            color: var(--deep-gold);
-            margin: 0 0 10px;
-            letter-spacing: 1px;
-        }
-
-        .sub-title {
-            font-size: 14px;
-            color: var(--hint-gray);
-            margin-bottom: 35px;
-            letter-spacing: 2px;
-            font-weight: 300;
-        }
+        h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold-primary); letter-spacing: 2px; margin: 0 0 8px; }
+        .sub-title { font-size: 13px; color: var(--text-light); margin-bottom: 40px; letter-spacing: 1px; }
 
         /* 登入區塊 */
         .login-box { display: flex; flex-direction: column; gap: 20px; }
-        
         .input-group { text-align: left; }
-        .input-group label { font-size: 13px; color: var(--deep-gold); margin-left: 5px; margin-bottom: 8px; display: block; font-weight: 500; }
-
-        select, input {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid #E0E0E0;
-            border-radius: 12px;
-            font-size: 16px;
-            background: #FBFAFA;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            outline: none;
-            color: var(--text-gray);
-        }
-
-        select:focus, input:focus { border-color: var(--soft-gold); background: #FFF; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1); }
-
-        .btn-primary {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #E2C275, #C5A059);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 8px 20px rgba(197, 160, 89, 0.2);
-            letter-spacing: 1px;
-            margin-top: 10px;
-        }
-
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197, 160, 89, 0.3); opacity: 0.95; }
-
-        /* 薪資結果頁面 */
-        #salaryDisplay { display: none; }
-
-        .main-card {
-            background: linear-gradient(145deg, #FFFFFF, #FFFCF7);
-            padding: 30px 20px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(212, 175, 55, 0.1);
-            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.02);
-        }
-
-        .total-label { font-size: 13px; color: var(--hint-gray); margin-bottom: 8px; }
-        .total-amount { font-size: 40px; font-family: 'Playfair Display', serif; color: var(--deep-gold); font-weight: 700; margin-bottom: 5px; }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 14px 0;
-            font-size: 15px;
-            border-bottom: 1px solid #F0F0F0;
-        }
-        .summary-item:last-child { border-bottom: none; }
-        .item-label { color: var(--hint-gray); }
-        .item-val { font-weight: 500; color: #333; }
-
-        /* 明細清單 */
-        .section-header { text-align: left; font-size: 15px; margin: 30px 0 15px; color: var(--deep-gold); font-weight: 600; }
+        label { font-size: 12px; color: var(--gold-primary); font-weight: 500; margin-left: 5px; margin-bottom: 8px; display: block; }
         
+        select, input {
+            width: 100%; padding: 16px; border: 1px solid #EAEAEA; border-radius: 14px;
+            font-size: 16px; background: #FAFAFA; transition: 0.3s; outline: none;
+        }
+        select:focus, input:focus { border-color: var(--gold-primary); background: #FFF; box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.08); }
+
+        .btn-gold {
+            width: 100%; padding: 18px; background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2);
+        }
+        .btn-gold:active { transform: scale(0.98); }
+
+        /* 薪資結果頁 */
+        #salaryDisplay { display: none; text-align: left; }
+        .teacher-header { margin-bottom: 25px; border-left: 4px solid var(--gold-primary); padding-left: 15px; }
+        .teacher-name { font-size: 20px; font-weight: 700; margin: 0; color: #111; }
+        
+        .main-card {
+            background: linear-gradient(145deg, #FFFFFF, #FDFCFB);
+            padding: 30px 20px; border-radius: 22px; margin-bottom: 25px;
+            border: 1px solid rgba(197, 160, 89, 0.15); text-align: center;
+        }
+        .total-label { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
+        .total-amount { font-family: 'Playfair Display', serif; font-size: 44px; color: var(--gold-dark); font-weight: 700; }
+
+        .summary-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F8F8F8; font-size: 15px; }
+        .summary-label { color: var(--text-light); }
+        .summary-val { font-weight: 500; }
+
+        /* 課程明細區 */
+        .detail-title { font-size: 14px; font-weight: 700; color: var(--gold-primary); margin: 30px 0 15px; letter-spacing: 1px; }
         .class-card {
-            text-align: left;
-            padding: 16px;
-            background: #F9F9F9;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border-left: 4px solid var(--soft-gold);
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 4px;
+            background: #F9F9F9; padding: 16px; border-radius: 12px; margin-bottom: 12px;
+            display: grid; grid-template-columns: 1fr auto; gap: 4px; border: 1px solid #F0F0F0;
         }
-        .class-date { font-size: 12px; color: var(--hint-gray); grid-column: 1 / 3; margin-bottom: 2px; }
-        .class-name { font-weight: 500; font-size: 15px; color: #333; }
-        .class-price { color: var(--deep-gold); font-weight: 700; font-size: 15px; text-align: right; }
-        .class-info { font-size: 12px; color: var(--hint-gray); }
+        .c-date { font-size: 11px; color: var(--text-light); grid-column: 1/3; }
+        .c-name { font-size: 14px; font-weight: 500; }
+        .c-fee { font-size: 14px; font-weight: 700; color: var(--gold-dark); text-align: right; }
+        .c-info { font-size: 11px; color: var(--text-light); }
 
-        /* 狀態列 */
-        .status-badge {
-            background: #E8F5E9;
-            color: #2E7D32;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .logout-link {
-            background: none;
-            color: var(--hint-gray);
-            border: none;
-            font-size: 13px;
-            text-decoration: underline;
-            margin-top: 25px;
-            cursor: pointer;
-        }
-
-        /* 讀取與錯誤 */
-        .loader { display: none; margin: 20px 0; color: var(--soft-gold); font-size: 14px; font-weight: 500; }
-        #errorTip { color: #D32F2F; font-size: 13px; margin-top: 10px; display: none; }
+        /* 狀態樣式 */
+        .status-badge { background: #E9F5EE; color: #2D7A4D; padding: 16px; border-radius: 14px; font-weight: 700; text-align: center; font-size: 14px; }
+        
+        #loader { display: none; color: var(--gold-primary); font-size: 14px; margin: 20px 0; text-align: center; }
+        #errorTip { color: #CF4444; font-size: 13px; margin-top: 15px; text-align: center; display: none; }
     </style>
 </head>
 <body>
@@ -179,190 +99,142 @@
     <div id="loginSection" class="login-box">
         <div class="input-group">
             <label>Instructor Name / 老師姓名</label>
-            <select id="teacherSelect">
-                <option value="">載入系統中，請稍候...</option>
-            </select>
+            <select id="teacherSelect"><option value="">系統連線中...</option></select>
         </div>
         <div class="input-group">
             <label>Password / 密碼</label>
             <input type="password" id="passwordInput" placeholder="身分證號碼末四碼">
         </div>
-        <button class="btn-primary" onclick="login()">LOGIN</button>
+        <button class="btn-gold" onclick="login()">LOGIN</button>
         <div id="errorTip"></div>
+        <div id="loader">處理中...</div>
     </div>
 
-    <div id="loader" class="loader">正在處理您的請求...</div>
-
     <div id="salaryDisplay">
-        <div style="margin-bottom: 25px;">
-            <div id="displayName" style="font-size: 18px; font-weight: 700; margin-bottom: 4px;"></div>
-            <div id="displayDate" style="font-size: 12px; color: #AAA;"></div>
+        <div class="teacher-header">
+            <p class="teacher-name" id="displayName"></p>
+            <p style="font-size: 11px; color: #AAA; margin: 4px 0 0;">Statement for the current month</p>
         </div>
-
+        
         <div class="main-card">
             <div class="total-label">本月核算應領總額</div>
             <div class="total-amount" id="totalPay">$0</div>
         </div>
 
-        <div class="summary-item">
-            <span class="item-label">鐘點費小計</span>
-            <span class="item-val" id="basePay">$0</span>
-        </div>
-        <div class="summary-item">
-            <span class="item-label">業績獎金</span>
-            <span class="item-val" id="bonusPay">$0</span>
-        </div>
-        <div class="summary-item">
-            <span class="item-label">固定項目 / 扣項</span>
-            <span class="item-val" id="fixedPay">$0</span>
-        </div>
+        <div class="summary-row"><span class="summary-label">鐘點費小計</span><span id="basePay"></span></div>
+        <div class="summary-row"><span class="summary-label">業績獎金</span><span id="bonusPay"></span></div>
+        <div class="summary-row"><span class="summary-label">固定加給 / 扣項</span><span id="fixedPay"></span></div>
 
-        <div class="section-header">課堂明細 DETAILS</div>
+        <div class="detail-title">課程明細 DETAILS</div>
         <div id="classList"></div>
 
-        <div id="confirmArea" style="margin-top: 30px;">
-            <button class="btn-primary" style="background: #2E7D32; box-shadow: 0 8px 20px rgba(46, 125, 50, 0.2);" onclick="confirmSalary()">確認薪資無誤</button>
+        <div id="confirmArea" style="margin-top: 40px;">
+            <button class="btn-gold" style="background: #2D7A4D; box-shadow: 0 10px 20px rgba(45, 122, 77, 0.2);" onclick="confirmSalary()">確認薪資無誤</button>
         </div>
-        <div id="confirmedMsg" style="display:none; margin-top: 20px;">
+        <div id="confirmedMsg" style="display:none; margin-top: 40px;">
             <div class="status-badge">✓ 已完成線上核對</div>
         </div>
-        
-        <button class="logout-link" onclick="logout()">安全登出 Logout</button>
+
+        <button onclick="location.reload()" style="background:none; border:none; color:#BBB; font-size:12px; width:100%; margin-top:40px; cursor:pointer; text-decoration:underline;">安全登出 Logout</button>
     </div>
 </div>
 
 <script>
-    // ⚠️ 請確保此處為 GAS 的「網頁應用程式網址」，必須以 /exec 結尾
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMMrzKOIhEOeDpHP74910qzfd-HAPnUgq0FTAImHUHCODT2DcnGZmyypS4fdOx9pYAaA/exec";
+    // ⚠️ 務必替換為您的 GAS 網址 (/exec 結尾)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMMrzKOIhEOeDpHP74910qzfd-HAPnUgq0FTAImHUHCODT2DcnGZmyypS4fdOx9pYAaA/exec"; 
 
-    window.onload = function() {
-        initApp();
+    window.onload = () => {
+        fetch(`${SCRIPT_URL}?action=getTeachers`)
+            .then(res => res.json())
+            .then(res => {
+                const sel = document.getElementById('teacherSelect');
+                sel.innerHTML = '<option value="">-- 請選擇您的姓名 --</option>';
+                res.data.forEach(n => sel.innerHTML += `<option value="${n}">${n}</option>`);
+            })
+            .catch(() => {
+                const tip = document.getElementById('errorTip');
+                tip.style.display = 'block';
+                tip.innerText = "無法連線至後台，請重新整理或聯絡小幫手。";
+            });
     };
 
-    // 初始化：抓取名單
-    function initApp() {
-        const select = document.getElementById('teacherSelect');
-        const tip = document.getElementById('errorTip');
-
-        // 設定 10 秒超時檢查，避免老師等太久
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-        fetch(`${SCRIPT_URL}?action=getTeachers`, { signal: controller.signal })
-            .then(res => res.json())
-            .then(response => {
-                clearTimeout(timeoutId);
-                select.innerHTML = '<option value="">-- 請選擇您的姓名 --</option>';
-                if(response.data && response.data.length > 0) {
-                    response.data.forEach(name => {
-                        let opt = document.createElement('option');
-                        opt.value = name; opt.innerHTML = name;
-                        select.appendChild(opt);
-                    });
-                }
-            })
-            .catch(err => {
-                console.error("連線錯誤:", err);
-                select.innerHTML = '<option value="">連線異常，請重新整理</option>';
-                tip.style.display = 'block';
-                tip.innerText = "目前後台連線較慢，請確認網路環境或重新整理網頁。";
-            });
-    }
-
-    // 登入驗證
     function login() {
         const name = document.getElementById('teacherSelect').value;
         const password = document.getElementById('passwordInput').value;
-        const tip = document.getElementById('errorTip');
-        
-        if(!name || !password) { showErr("請選擇姓名並輸入身分證末四碼"); return; }
+        if(!name || !password) return;
 
-        toggleLoading(true);
-        tip.style.display = "none";
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('errorTip').style.display = 'none';
 
         fetch(`${SCRIPT_URL}?action=login&name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}`)
             .then(res => res.json())
-            .then(response => {
-                toggleLoading(false);
-                if(response.success) {
-                    showSalary(response.data);
+            .then(res => {
+                document.getElementById('loader').style.display = 'none';
+                if(res.success) {
+                    renderSalary(res.data);
                 } else {
-                    showErr("登入失敗：請確認密碼是否正確");
+                    const tip = document.getElementById('errorTip');
+                    tip.style.display = 'block';
+                    tip.innerText = "驗證失敗，請檢查密碼是否正確。";
                 }
-            })
-            .catch(() => {
-                toggleLoading(false);
-                showErr("系統連線逾時，請再試一次");
             });
     }
 
-    // 顯示內容
-    function showSalary(data) {
+    function renderSalary(data) {
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('salaryDisplay').style.display = 'block';
-
-        const now = new Date();
-        document.getElementById('displayDate').innerText = `${now.getFullYear()} / ${now.getMonth() + 1} 月薪資結算`;
-        document.getElementById('displayName').innerText = `${data.name} 老師`;
+        
+        // 渲染基本資訊
+        document.getElementById('displayName').innerText = data.name + " 老師";
+        document.getElementById('totalPay').innerText = "$" + Math.round(data.total).toLocaleString();
         document.getElementById('basePay').innerText = "$" + Math.round(data.base).toLocaleString();
         document.getElementById('bonusPay').innerText = "$" + Math.round(data.bonus).toLocaleString();
-        
-        let fixedVal = data.total - data.base - data.bonus;
-        document.getElementById('fixedPay').innerText = "$" + Math.round(fixedVal).toLocaleString();
-        document.getElementById('totalPay').innerText = "$" + Math.round(data.total).toLocaleString();
-        
-        const list = document.getElementById('classList');
-        list.innerHTML = "";
-        data.classes.forEach(c => {
-            list.innerHTML += `
-                <div class="class-card">
-                    <div class="class-date">${c.date}</div>
-                    <div class="class-name">${c.title}</div>
-                    <div class="class-price">$${Math.round(c.fee).toLocaleString()}</div>
-                    <div class="class-info">出席: ${c.status} 人</div>
-                </div>
-            `;
-        });
+        document.getElementById('fixedPay').innerText = "$" + Math.round(data.fixed).toLocaleString();
 
+        // 渲染課程明細 (這部分是核心，確保清空舊資料)
+        const listDiv = document.getElementById('classList');
+        listDiv.innerHTML = "";
+        if(data.classes && data.classes.length > 0) {
+            data.classes.forEach(c => {
+                listDiv.innerHTML += `
+                    <div class="class-card">
+                        <div class="c-date">${c.date}</div>
+                        <div class="c-name">${c.title}</div>
+                        <div class="c-fee">$${Math.round(c.fee).toLocaleString()}</div>
+                        <div class="c-info">出席人數: ${c.status}</div>
+                    </div>
+                `;
+            });
+        } else {
+            listDiv.innerHTML = '<p style="font-size:12px; color:#AAA;">暫無明細資料</p>';
+        }
+
+        // 核心同步邏輯：根據 Tako 老師的實際狀態切換 UI
         if(data.isConfirmed) {
             document.getElementById('confirmArea').style.display = 'none';
             document.getElementById('confirmedMsg').style.display = 'block';
+        } else {
+            document.getElementById('confirmArea').style.display = 'block';
+            document.getElementById('confirmedMsg').style.display = 'none';
         }
     }
 
     function confirmSalary() {
         if(!confirm("您好，點擊確認後表示您已核對本月薪資明細無誤。")) return;
         const name = document.getElementById('teacherSelect').value;
-        toggleLoading(true);
+        document.getElementById('loader').style.display = 'block';
 
         fetch(`${SCRIPT_URL}?action=confirm&name=${encodeURIComponent(name)}`)
             .then(res => res.json())
-            .then(response => {
-                toggleLoading(false);
-                if(response.success) {
+            .then(res => {
+                document.getElementById('loader').style.display = 'none';
+                if(res.success) {
                     document.getElementById('confirmArea').style.display = 'none';
                     document.getElementById('confirmedMsg').style.display = 'block';
-                    alert("核對完成！系統已記錄您的確認時間。");
+                    alert("核對完成，感謝老師！");
                 }
             });
     }
-
-    function logout() {
-        document.getElementById('salaryDisplay').style.display = 'none';
-        document.getElementById('loginSection').style.display = 'block';
-        document.getElementById('passwordInput').value = "";
-    }
-
-    function toggleLoading(show) {
-        document.getElementById('loader').style.display = show ? 'block' : 'none';
-    }
-
-    function showErr(text) {
-        const tip = document.getElementById('errorTip');
-        tip.style.display = 'block';
-        tip.innerText = text;
-    }
 </script>
-
 </body>
 </html>
