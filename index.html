@@ -123,7 +123,7 @@
 
         <div class="summary-row"><span class="summary-label">鐘點費小計</span><span id="basePay"></span></div>
         <div class="summary-row"><span class="summary-label">業績獎金</span><span id="bonusPay"></span></div>
-        <div class="summary-row"><span class="summary-label">固定加給 / 扣項</span><span id="fixedPay"></span></div>
+        <div class="summary-row" id="fixedPayRow"><span class="summary-label">固定加給 / 扣項</span><span id="fixedPay"></span></div>
 
         <div class="detail-title">課程明細 DETAILS</div>
         <div id="classList"></div>
@@ -141,7 +141,7 @@
 
 <script>
     // ⚠️ 務必替換為您的 GAS 網址 (/exec 結尾)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMMrzKOIhEOeDpHP74910qzfd-HAPnUgq0FTAImHUHCODT2DcnGZmyypS4fdOx9pYAaA/exec"; 
+    const SCRIPT_URL = "您的_GAS_網址_務必以_exec_結尾"; 
 
     window.onload = () => {
         fetch(`${SCRIPT_URL}?action=getTeachers`)
@@ -154,7 +154,7 @@
             .catch(() => {
                 const tip = document.getElementById('errorTip');
                 tip.style.display = 'block';
-                tip.innerText = "無法連線至後台，請重新整理或聯絡小幫手。";
+                tip.innerText = "無法連線至後台，請重新整理網頁。";
             });
     };
 
@@ -184,14 +184,28 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('salaryDisplay').style.display = 'block';
         
+        // 核心修復：強制將資料轉換為乾淨的數字，過濾掉逗號與非數值字元
+        const totalNum = Number(String(data.total || 0).replace(/,/g, ''));
+        const baseNum = Number(String(data.base || 0).replace(/,/g, ''));
+        const bonusNum = Number(String(data.bonus || 0).replace(/,/g, ''));
+        const fixedNum = Number(String(data.fixed || 0).replace(/,/g, ''));
+
         // 渲染基本資訊
         document.getElementById('displayName').innerText = data.name + " 老師";
-        document.getElementById('totalPay').innerText = "$" + Math.round(data.total).toLocaleString();
-        document.getElementById('basePay').innerText = "$" + Math.round(data.base).toLocaleString();
-        document.getElementById('bonusPay').innerText = "$" + Math.round(data.bonus).toLocaleString();
-        document.getElementById('fixedPay').innerText = "$" + Math.round(data.fixed).toLocaleString();
+        document.getElementById('totalPay').innerText = "$" + totalNum.toLocaleString();
+        document.getElementById('basePay').innerText = "$" + baseNum.toLocaleString();
+        document.getElementById('bonusPay').innerText = "$" + bonusNum.toLocaleString();
 
-        // 渲染課程明細 (這部分是核心，確保清空舊資料)
+        // 判斷是否顯示「固定加給 / 扣項」
+        const fixedPayRow = document.getElementById('fixedPayRow');
+        if (fixedNum !== 0) {
+            fixedPayRow.style.display = 'flex'; // 有數值才顯示
+            document.getElementById('fixedPay').innerText = "$" + fixedNum.toLocaleString();
+        } else {
+            fixedPayRow.style.display = 'none'; // 為 0 則整行隱藏
+        }
+
+        // 渲染課程明細
         const listDiv = document.getElementById('classList');
         listDiv.innerHTML = "";
         if(data.classes && data.classes.length > 0) {
@@ -209,7 +223,7 @@
             listDiv.innerHTML = '<p style="font-size:12px; color:#AAA;">暫無明細資料</p>';
         }
 
-        // 核心同步邏輯：根據 Tako 老師的實際狀態切換 UI
+        // 狀態切換邏輯
         if(data.isConfirmed) {
             document.getElementById('confirmArea').style.display = 'none';
             document.getElementById('confirmedMsg').style.display = 'block';
@@ -231,7 +245,7 @@
                 if(res.success) {
                     document.getElementById('confirmArea').style.display = 'none';
                     document.getElementById('confirmedMsg').style.display = 'block';
-                    alert("核對完成，感謝老師！");
+                    alert("已記錄您核對完成，謝謝老師！"); // 依需求修改提示語
                 }
             });
     }
